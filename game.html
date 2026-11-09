@@ -1,6 +1,34 @@
 <html>
   <head>
+    <!-- This meta code allows the code to handle different symbols and characters -->
+    <meta charset="UTF-8">
+    <!-- This meta code below allows the game to be responsive and work on different screen sizes using initial-scale=0.75 which sets the initial zoom level to 75%-->
+    <meta name="viewport" content="width=device-width, initial-scale=0.75">
     <title>Space invader - Game on T4 </title>
+    <style>
+    /* This uses advanced CSS elements to make the game look appealing */
+      body {
+        background-color: #05060f;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;  
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+      canvas {
+        border: 3px solid #3a4a8a;
+        margin-top: 16px;
+        max-width: 100%;
+      }
+      p {
+        color: #9aa5d0;
+        font-size: 14px;
+        margin-top: 10px;
+        text-align: center;
+        padding: 0 10px;
+      }
+    </style>
   </head>
   <body>
   <canvas id="game" width="800" height="600"></canvas>
