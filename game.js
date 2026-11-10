@@ -14,7 +14,11 @@
     var level = 0;    var frame = 0;    var players = [];
     var bullets = [];    var asteroids = [];    var enemies = [];
     var boss = null;    var enemyDir = 1;    var keys = {};
-    var muted = false;    var audio;    var stars = [];
+    var muted = false;    var audio;   
+    var stars = [];
+for (var s = 0; s < 60; s++) {
+  stars.push({ x: Math.random() * 800, y: Math.random() * 600, size: Math.random() * 2 + 1 });
+}
     
     // Keyboard input and events
     document.addEventListener("keydown", function (e) {
@@ -178,4 +182,125 @@ for (i = bullets.length - 1; i >= 0; i--) {
     if (used) { bullets.splice(i, 1); }
 }
 
+// Enemies movement; sideways and go down when they reach a wall
 
+var atWall = false;
+for (i = 0; i < enemies.length; i++) {
+    enemies[i].x += L.speed * enemyDir;
+    if (enemies[i].x > 770 || enemies[i].x < 30) { atWall = true; }
+}
+
+if (atWall) { 
+    enemyDir = -enemyDir;
+    for (i = 0; i < enemies.length; i++) { 
+        enemies[i].y += 20;
+    }
+    enemies = enemies.filter(function (e) { return e.y < 600; });
+}
+
+// The BOSS movement and fireball system
+
+if (boss) { 
+    boss.x += 3 * boss.dir;
+    if (boss.x > 720 || boss.x < 80) { boss.dir = -boss.dir; }
+    if (frame % 50 === 0) {
+        asteroids.push({ x: boss.x, y: boss.y + 40, speed: 5, icon: "🔥" });
+    }
+}
+
+// Asteroids movement and checking if they hit a player
+
+if (frame % L.asteroidEvery === 0) { 
+    asteroids.push({ x: Math.random() * 760 + 20, y: -20, speed: 3, icon: "☄️" });
+}
+for (i = asteroids.length - 1; i >= 0; i--) { 
+    asteroids[i].y += asteroids[i].speed;
+    if (asteroids[i].y > 620) { asteroids.splice(i, 1); }
+}
+
+for (i = 0; i < players.length; i++) { 
+    p = players[i];
+    if (p.lives <= 0 || p.hurt > 0) { continue; }
+    for (j = 0; j < asteroids.length; j++) {
+        if(near(p, asteroids[j], 26)) {
+            hurtPlayer(p); asteroids.splice(j, 1); break; }
+    }
+    for (j = 0; j < enemies.length && p.hurt === 0; j++) { 
+        if(near(p, enemies[j], 30)) { hurtPlayer(p); enemies.splice(j, 1); break; }
+    }
+}
+
+// level beaten and ending
+
+if (boss && boss.hp <= 0) { winGame(); return; }
+if (!boss && enemies.length === 0) { nextLevel(); return; }
+var alive = 0;
+for (i = 0; i < players.length; i++) { if (players[i].lives > 0) { alive++; } 
+}
+if (alive === 0) {gameOver(); }
+
+function emoji(symbol, x, y, size) {
+    ctx.font = size + "px Arial";
+    ctx.fillText(symbol, x, y);
+}
+
+function drawShip(p) {
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y - 22);
+    ctx.lineTo(p.x - 20, p.y + 16);
+    ctx.lineTo(p.x + 20, p.y + 16);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(p.x - 4, p.y - 2, 8, 12); 
+}
+
+function hearts(n) {
+    return n > 0 ? "❤️".repeat(n) : "OUT";
+}
+
+function drawHUD() {
+    ctx.font = "18px Arial";
+    ctx.fillStyle = players[0].color;
+    ctx.textAlign = "left";
+    ctx.fillText("P1  Score: " + players[0].score + "   " + hearts(players[0].lives), 15, 20);
+    if (players.length === 2) {
+    ctx.fillStyle = players[1].color;
+    ctx.textAlign = "right";
+    ctx.fillText("P2  Score: " + players[1].score + "   " + hearts(players[1].lives), 785, 20);
+    }
+    ctx.fillStyle = "#fff";
+    ctx.textAlign = "center";
+    ctx.fillText(levels[level].name, 400, 20);
+}
+
+function drawMenu() {
+    ctx.fillStyle = "#fff";
+    ctx.font = "56px Arial";
+    ctx.fillText("SPACE INVADERS", 400, 190);
+    ctx.font = "24px Arial";
+    ctx.fillText("Press 1 for ONE player", 400, 300);
+    ctx.fillText("Press 2 for TWO players", 400, 340);
+    ctx.font = "16px Arial";
+    ctx.fillText("Shoot the aliens, dodge the asteroids, beat the boss!", 400, 430);
+}
+
+function draw() {
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "center";
+    ctx.fillStyle = state === "menu" ? levels[0].bg : levels[level].bg;
+    ctx.fillRect(0, 0, 800, 600);
+    ctx.fillStyle = "#fff";
+    for (var i = 0; i < stars.length; i++) {
+    ctx.fillRect(stars[i].x, stars[i].y, stars[i].size, stars[i].size);
+}    
+
+if (state === "menu") { drawMenu(); return;}
+
+// flashing the player when hurt mechanism
+
+for (i = 0; i < players.length; i++) {
+    if (players[i].lives > 0 && players[i].hurt % 10 < 5) { drawShip(players[i]); }
+}
+}
