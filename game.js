@@ -331,5 +331,12 @@ if (state === "message") {
     ctx.fillText(message, 400, 300);
     ctx.textAlign = "center";
     ctx.fillText(message, 400, 300);
+}   
 }
-}
+
+setInterval(function () {
+    if (state === "playing") {
+        update();
+    }
+    draw();
+}, 1000 / 60);
