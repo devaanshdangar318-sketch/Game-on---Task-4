@@ -77,7 +77,7 @@ function makePlayer(x, color, left, right, shoot) {
 function startGame(n) { 
     numPlayers = n;
     if (!audio) { audio = new (window.AudioContext || window.webkitAudioContext)(); }
-    players = [ makePlayer(n === 1 ? 400 : 250, '#4cd964', ["a"], ["d"], ["w"], [" "])];
+    players = [ makePlayer(n === 1 ? 400 : 250, '#4cd964', ["a"], ["d"], ["w", " "])];  
     if (n === 2) { players.push(makePlayer(550, '#ffb347', ["arrowleft"], ["arrowright"], ["arrowup"])); }
     level = 0;
     loadLevel();    
@@ -113,12 +113,12 @@ function showMessage(text, ms, thenDo) {
 function nextLevel() { 
     level++;
     beep(660, 0.3, "triangle");
-    showMessage(level[level].name, 1500, loadLevel);
+    showMessage(levels[level].name, 1500, loadLevel);
 }
 
-function gameOver() { 
-    beep(880, 0.6, "triangle");
-    showMessage("YOU WIN!", 4000, function () { state = "menu"; });
+function gameOver() {
+    beep(100, 0.8, "sawtooth");
+    showMessage("GAME OVER - restarting...", 2500, function () { startGame(numPlayers); });
 }
 
 function winGame() {
@@ -141,7 +141,7 @@ function update() {
     frame++;
     var L = levels[level];
     var i, j, p;
-}
+
 
 // How the players move and shoot
 
@@ -238,7 +238,7 @@ var alive = 0;
 for (i = 0; i < players.length; i++) { if (players[i].lives > 0) { alive++; } 
 }
 if (alive === 0) {gameOver(); }
-
+}
 function emoji(symbol, x, y, size) {
     ctx.font = size + "px Arial";
     ctx.fillText(symbol, x, y);
@@ -328,8 +328,6 @@ if (state === "message") {
     ctx.fillRect(0, 0, 800, 600);
     ctx.fillStyle = "#fff";
     ctx.font = "44px Arial";
-    ctx.fillText(message, 400, 300);
-    ctx.textAlign = "center";
     ctx.fillText(message, 400, 300);
 }   
 }
