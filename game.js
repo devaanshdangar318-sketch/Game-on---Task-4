@@ -294,7 +294,7 @@ function draw() {
     ctx.fillStyle = "#fff";
     for (var i = 0; i < stars.length; i++) {
     ctx.fillRect(stars[i].x, stars[i].y, stars[i].size, stars[i].size);
-}    
+}
 
 if (state === "menu") { drawMenu(); return;}
 
@@ -302,5 +302,34 @@ if (state === "menu") { drawMenu(); return;}
 
 for (i = 0; i < players.length; i++) {
     if (players[i].lives > 0 && players[i].hurt % 10 < 5) { drawShip(players[i]); }
+}
+ctx.fillStyle = "#ffe066";
+for (i = 0; i < bullets.length; i++) { 
+    ctx.fillRect(bullets[i].x - 2, bullets[i].y - 8, 4, 16);
+}
+for (i = 0; i < enemies.length; i++) {
+    emoji(levels[level].enemy, enemies[i].x, enemies[i].y, 34);
+}
+for(i = 0; i < asteroids.length; i++) {
+    emoji(asteroids[i].icon, asteroids[i].x, asteroids[i].y, 32);
+}
+if (boss) {
+    emoji("👹", boss.x, boss.y, 90);
+    ctx.fillStyle = "#400";
+    ctx.fillRect(300, 50, 200, 10);
+    ctx.fillStyle = "#f33";
+    ctx.fillRect(300, 50, Math.max(boss.hp, 0) * 8, 10);  //Makes the boss health bar and tracks it as it reduces
+}
+
+drawHUD();
+
+if (state === "message") {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+    ctx.fillRect(0, 0, 800, 600);
+    ctx.fillStyle = "#fff";
+    ctx.font = "44px Arial";
+    ctx.fillText(message, 400, 300);
+    ctx.textAlign = "center";
+    ctx.fillText(message, 400, 300);
 }
 }
